@@ -94,7 +94,7 @@ void conductor1()
         printf("[Madoka] Tickets selling now!\n");
         sem_wait(&stop);
         // the car stops
-        printf("[Madoka] Oh, the bus stops! I must get back to work.\n");
+        printf("[Madoka] The front door is opening...\n");
     }
 }
 
@@ -115,7 +115,7 @@ void conductor2()
         printf("[Homora] Tickets selling now!\n");
         sem_wait(&stop);
         // the car stops
-        printf("[Homora] Oh, the bus stops! I must get back to work.\n");
+        printf("[Homora] The back door is opening...\n");
     }
 }
 
