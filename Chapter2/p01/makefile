@@ -10,5 +10,6 @@ server: server.o
 server.o: server.c const.h
 	gcc -c server.c
 
+.PHONY: clean
 clean:
 	rm -rf *.o client server pipe.*

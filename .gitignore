@@ -1,0 +1,9 @@
+# Chapter2
+Chapter2/*/*.o
+Chapter2/*/.*/
+
+# Chapter2_p01
+Chapter2/p01/pipes.*
+
+# Hermit Crab Shell
+hermit-crab-shell/src/.*/

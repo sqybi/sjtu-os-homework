@@ -5,5 +5,6 @@ rw: rw.o
 rw.o: rw.c
 	gcc -c rw.c
 
+.PHONY: clean
 clean:
 	rm -rf *.o rw
