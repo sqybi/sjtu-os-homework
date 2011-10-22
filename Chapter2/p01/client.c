@@ -139,6 +139,7 @@ void childProcess()
     while (TRUE)
     {
         // read message from pipe
+		memset(message, 0, sizeof(message)); // clear message sent before
         read(fd, message, MAX_MESSAGE_LENGTH);
         if (strcmp(message, pmessage) != 0) // message changed!
         {
