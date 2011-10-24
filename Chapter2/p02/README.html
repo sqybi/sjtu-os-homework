@@ -1,0 +1,53 @@
+<h1>Driver-Conductor Model</h1>
+
+<hr />
+
+<h2>Aim</h2>
+
+<p>Implement the driver-conductor model.</p>
+
+<ul>
+<li>There are one driver and two conductors on the bus which has two doors.</li>
+<li>Each conductor has management of one of the doors.</li>
+<li>The driver won't start the bus until all the doors are closed.</li>
+<li>The conductors will open the door when bus stops.</li>
+</ul>
+
+<p>Each driver or conductor corresponding to a sperated thread, then finish the synchronization of the three threads by semaphore.</p>
+
+<h2>Compile</h2>
+
+<p>Just execute <code>make</code> (make need to be installed) to make the program, and a file named "bus" will be generated.</p>
+
+<p>The command <code>make clean</code> will clean all temporary files, including the executable program "bus".</p>
+
+<h2>Usage</h2>
+
+<p>You must compile before run the program.</p>
+
+<p>Enter <code>./bus</code> to execute the program. <br />
+Then everything is to be done automatically, and each thread will tell you what it is doing by print something in terminal.</p>
+
+<p>If you want to terminate the program, press enter directly.</p>
+
+<h2>Advanced Usage</h2>
+
+<p>By default, it takes each conductor 3 seconds to close the door, and 5 to 7 seconds (randomly) for each stop, and 5 to 7 seconds for the bus to run from one station to another station. <br />
+You could modify this by edit the source code.</p>
+
+<h2>Others</h2>
+
+<p>The two conductors' name are Madoka and Homora, which comes from the animation <em>Puella Magi Madoka Magica</em>.</p>
+
+<p>You could get the newest version of this program at:</p>
+
+<ul>
+<li>https://github.com/sqybi/OS-Homework/tree/master/Chapter2/p02</li>
+</ul>
+
+<p>All the codes are published under:</p>
+
+<ul>
+<li>GNU General Public License v3
+http://www.gnu.org/licenses/gpl.html</li>
+</ul>

@@ -1,0 +1,57 @@
+<h1>Pipe File Monitoring</h1>
+
+<hr />
+
+<h2>Aim</h2>
+
+<p>Use <code>fork()</code> to create multiple child processes, and monitor several pipe files at the same time (more than 3).</p>
+
+<h2>Compile</h2>
+
+<p>Just execute <code>make</code> (make need to be installed) to make the whole project, and two files named "client" and "server" will be generated.</p>
+
+<p>You could execute <code>make client</code> or <code>make server</code> to compile only one of the two programs.</p>
+
+<p>The command <code>make clean</code> will clean all temporary files, including the executable programs "client" and "server".</p>
+
+<h2>Usage</h2>
+
+<p>You must compile before run the two programs.</p>
+
+<h3>Client</h3>
+
+<p>Use command <code>./client</code> to run the client program, and enter the number of pipes you'd like to monitor. <br />
+Then, the program start to monitor these pipes in background.</p>
+
+<p>Some pipe files may be created under current folder if not exist before. The pipe files' name looks like: pipe.1, pipe.2, ..., etc.</p>
+
+<p>If you wanna quit the program, just press enter. The processes will be killed automatically.</p>
+
+<h3>Server</h3>
+
+<p>Command <code>./server</code> is expected to run the server.</p>
+
+<p>When server is running, you will be asked to enter the number of pipe which you want to send message to, and the content of the message. The pipe file's name is as described below.</p>
+
+<p>If the number of pipe you input is -1, then the server will terminate.</p>
+
+<h2>Advanced Usage</h2>
+
+<p>To change some parameters, like maximum number of pipes or maximum length of each message, you could edit "const.h" and recompile the whole project.</p>
+
+<p>What's more, you could write to pipe file by <code>echo</code> or <code>cat</code> command manully, without running the server.</p>
+
+<h2>Others</h2>
+
+<p>You could get the newest version of this program at:</p>
+
+<ul>
+<li>https://github.com/sqybi/OS-Homework/tree/master/Chapter2/p01</li>
+</ul>
+
+<p>All the codes are published under:</p>
+
+<ul>
+<li>GNU General Public License v3</li>
+<li>http://www.gnu.org/licenses/gpl.html</li>
+</ul>

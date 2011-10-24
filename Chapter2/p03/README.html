@@ -1,0 +1,60 @@
+<h1>Reader-Writer Model</h1>
+
+<hr />
+
+<h2>Aim</h2>
+
+<p>Implement the reader-writer model.</p>
+
+<ul>
+<li>There 4 readers and 4 writers, who are trying to access the database.</li>
+<li>When there is any other reader or writer in the database, the writer must
+wait for the access permission.</li>
+<li>The reader cannot get the access premission when some other writer is
+accessing the database, but able to have the permission when some other
+reader is in the database.</li>
+<li>Program must print the status of each reader and writer when catch a signal SIGINT.</li>
+</ul>
+
+<p>Each reader or writer is corresponding to a sperated thread, then do the synchronization with other threads by semaphores.</p>
+
+<h2>Compile</h2>
+
+<p>Just execute <code>make</code> (make need to be installed) to make the program, and a file named "rw" will be generated.</p>
+
+<p>The command <code>make clean</code> will clean all temporary files, including the executable program "rw".</p>
+
+<h2>Usage</h2>
+
+<p>You must compile before run the program.</p>
+
+<p>Enter <code>./rw</code> to execute the program.</p>
+
+<p>Then send a SIGINT signal to the process. In most Linux shells, <code>Ctrl-C</code> is used to send SIGINT. <br />
+When catch a SIGINT signal, the program will print several lines of threads' status.</p>
+
+<p>What's more, each reader and writer will take 1 to 5 seconds randomly when access the database, and sleep 1 to 5 seconds randomly when access finished.</p>
+
+<p>If you want to terminate the program, press enter directly.</p>
+
+<h2>Advanced Usage</h2>
+
+<p>You could modify the sleep time of the database accessing time by edit the source code.</p>
+
+<h2>Others</h2>
+
+<p>The four readers are named <em>Ryuuji</em>, <em>Taiga</em>, <em>Minori</em> and <em>Ami</em>, which comes from animation <em>Tiger X Dragon</em>. <br />
+The four writers are named <em>Makoto</em>, <em>Sekai</em>, <em>Kotonoha</em> and <em>Setsuna</em>, which comes from animation <em>School Days</em>.</p>
+
+<p>You could get the newest version of this program at:</p>
+
+<ul>
+<li>https://github.com/sqybi/OS-Homework/tree/master/Chapter2/p03</li>
+</ul>
+
+<p>All the codes are published under:</p>
+
+<ul>
+<li>GNU General Public License v3
+http://www.gnu.org/licenses/gpl.html</li>
+</ul>

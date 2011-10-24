@@ -1,3 +1,15 @@
+/*
+ * Shell Main Process
+ *
+ *  Including some major functions for the whole shell.
+ *  The main() function is here.
+ */
+
+// define _GNU_SOURCE to include the declare of get_current_dir_name()
+#ifndef _GNU_SOURCE
+#define  _GNU_SOURCE
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -5,48 +17,49 @@
 #include <sys/wait.h>
 #include <readline/readline.h>
 #include "function.h"
+#include "constant.h"
 
-#define MAX_COMMAND_LENGTH 1024
+// Variables
+char *line,
+     *prompt;
 
-char *command = NULL,
-         *cwd = NULL;
+// Initialize all vairables of the shell, and other init operations
+void shell_initialize(void)
+{
+    // clear the pointers
+    line = NULL;
+    prompt = NULL;
+}
 
-void shell_initialize()
+// Run commands in cmd_list
+void shell_run_commands(COMMAND_LIST cmd_list)
 {
 
 }
 
-int main()
+int main(int argc, char **argv)
 {
-    //initialize
-    //command = malloc(MAX_COMMAND_LENGTH);
+    // variables
+    COMMAND_LIST cmd_list;
 
     // initialize the shell
     shell_initialize();
 
     while (1)
     {
-        //get current working directory
-        if (cwd != NULL) free(cwd);
-        cwd = get_current_dir_name();
-        get_last_dir(&cwd);
+        // get last directory of current working directory
+        if (prompt != NULL) free(prompt);
+        prompt = get_prompt();
 
-        //read command
-        if (command) free(command);
-        command = readline(cwd);
-/*
-        //create child process
-        int child_pid = fork();
-        if (child_pid != 0) //here is parent process
-        {
-            int status;
-            waitpid(child_pid, &status, 0);
-        }
-        else //here is child process
-        {
-            
-        }
-*/
+        // read command
+        if (line) free(line);
+        line = readline(prompt);
+
+        // split input to COMMAND_LIST
+        cmd_list = split_command(line);
+
+        // run commands
+        shell_run_commands(cmd_list);
     }
     return 0;
 }
