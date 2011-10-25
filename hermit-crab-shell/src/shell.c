@@ -16,30 +16,25 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <readline/readline.h>
+#include "lexer.h"
+#include "const.h"
 
 // Variables
-char *line,
-     *prompt;
+char *single_line,
+     *prompt,
+     line[STRING_MAX_LENGTH];
 
 // Initialize all vairables of the shell, and other init operations
 void shell_initialize(void)
 {
     // clear the pointers
-    line = NULL;
+    single_line = NULL;
     prompt = NULL;
 }
 
-// Run commands in cmd_list
-void shell_run_commands(COMMAND_LIST cmd_list)
-{
-
-}
 
 int main(int argc, char **argv)
 {
-    // variables
-    COMMAND_LIST cmd_list;
-
     // initialize the shell
     shell_initialize();
 
@@ -50,14 +45,21 @@ int main(int argc, char **argv)
         prompt = get_prompt();
 
         // read command
-        if (line) free(line);
-        line = readline(prompt);
+        if (single_line) free(single_line);
+        strcpy(line, "");
+        single_line = readline(prompt);
+        while (strlen(single_line) > 0 &&
+                 single_line[strlen(single_line) - 1] == '\\')
+        {
+            strcat(line, single_line);
+            if (single_line) free(single_line);
+            single_line = readline(prompt);
+            line[strlen(line) - 1] = '\0';
+        }
+        strcat(line, single_line);
 
-        // split input to COMMAND_LIST
-        cmd_list = split_command(line);
+        // get tokens
 
-        // run commands
-        shell_run_commands(cmd_list);
     }
     return 0;
 }

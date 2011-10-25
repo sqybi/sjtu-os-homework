@@ -6,8 +6,9 @@
 #include <unistd.h>
 #include "tokens.h"
 #include "const.h"
+#include "lexer.h"
 
-int string_finished;
+int content_empty;
 char content[STRING_MAX_LENGTH] = "";
 int ioflag = 0;
 TOKEN_LIST_NODE *head, *tail;
@@ -17,12 +18,32 @@ void add_token_node(TOKEN *t)
     if (head == NULL)
     {
         head = malloc(sizeof(TOKEN_LIST_NODE));
+        head->tok = t;
         tail = head;
     }
     else
     {
-    	tail->next = malloc(sizeof(TOKEN_LIST_NODE));
-    	tail = tail->next;
+        tail->next = malloc(sizeof(TOKEN_LIST_NODE));
+        tail = tail->next;
+        tail->tok = t;
+    }
+}
+
+void content_start()
+{
+    if (content_empty)
+    {
+        strcpy(content, "");
+        content_empty = 0;
+    }
+}
+
+void content_end()
+{
+    if (!content_empty)
+    {
+        add_token_node(new_token_string(content));
+        content_empty = 1;
     }
 }
 
@@ -38,32 +59,67 @@ space  \n|\r|\t|\f|" "
 
 <INITIAL>
 {
-    \"          { string_finished = 0; strcpy(content, ""); BEGIN(STRINGMODE); }
-    \|          { add_token_node(new_token_pipe()); }
-    &           { add_token_node(new_token_bg());; }
-    \>          { add_token_node(new_token_in()); }
-    \<          { add_token_node(new_token_out()); }
-    ;           { add_token_node(new_token_next()); }
-    {space}     { }
-    [^" "]*     { add_token_node(new_token_string(yytext)); }
+    \"          { content_start(); BEGIN(STRINGMODE); }
+    \|          { content_end(); add_token_node(new_token_pipe()); }
+    &           { content_end(); add_token_node(new_token_bg());; }
+    \>          { content_end(); add_token_node(new_token_in()); }
+    \<          { content_end(); add_token_node(new_token_out()); }
+    ;           { content_end(); add_token_node(new_token_next()); }
+    {space}     { content_end(); }
+    .           { content_start(); strcat(content, yytext); }
 }
 
 <STRINGMODE>
 {
-    {space}     { if (string_finished) { add_token_node(new_token_string(content)); BEGIN(INITIAL); } else strcat(content, yytext); }
-    \"          { string_finished = 1 - string_finished; }
-    .           { strcat(content, yytext); }
+    \"          { BEGIN(INITIAL); }
+    .           { content_start(); strcat(content, yytext); }
 }
+
+<<EOF>>         { content_end(); yyterminate(); }
 
 %%
 
 TOKEN_LIST_NODE *get_token_list(const char* s)
 {
     head = tail = NULL;
-    char *ts = malloc(strlen(s) + 2);
-    strcpy(ts, s);
-    strcat(ts, " ");
-    yy_scan_string(ts);
+    content_empty = 1;
+    yy_scan_string(s);
     yylex();
     return head;
 }
+
+/*
+
+// debug code
+int main()
+{
+    TOKEN_LIST_NODE *h = get_token_list("test\"abc\"def\"t\" \"ttt\"");
+    while (h != NULL)
+    {
+        switch (h->tok->type)
+        {
+        case TOKEN_TYPE_STRING:
+            printf("%s %s\n", "STRING", h->tok->t_string.str);
+            break;
+        case TOKEN_TYPE_PIPE:
+            printf("%s\n", "PIPE");
+            break;
+        case TOKEN_TYPE_BG:
+            printf("%s\n", "BG");
+            break;
+        case TOKEN_TYPE_IN:
+            printf("%s\n", "IN");
+            break;
+        case TOKEN_TYPE_OUT:
+            printf("%s\n", "OUT");
+            break;
+        case TOKEN_TYPE_NEXT:
+            printf("%s\n", "NEXT");
+            break;
+        }
+        h = h->next;
+    }
+    printf("\n");
+    return 0;
+}
+*/

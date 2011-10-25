@@ -67,7 +67,7 @@ TOKEN *new_token_next();
 // list of tokens
 typedef struct token_list_node
 {
-    TOKEN tok;
+    TOKEN *tok;
     struct token_list_node *next;
 } TOKEN_LIST_NODE;
 

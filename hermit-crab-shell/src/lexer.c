@@ -1,3 +1,4 @@
+#line 2 "lexer.c"
 #line 2 "lexer.lex"
 
 #include <stdlib.h>
@@ -7,7 +8,7 @@
 #include "tokens.h"
 #include "const.h"
 
-int string_finished;
+int content_empty;
 char content[STRING_MAX_LENGTH] = "";
 int ioflag = 0;
 TOKEN_LIST_NODE *head, *tail;
@@ -17,19 +18,39 @@ void add_token_node(TOKEN *t)
     if (head == NULL)
     {
         head = malloc(sizeof(TOKEN_LIST_NODE));
+        head->tok = t;
         tail = head;
     }
     else
     {
-    	tail->next = malloc(sizeof(TOKEN_LIST_NODE));
-    	tail = tail->next;
+        tail->next = malloc(sizeof(TOKEN_LIST_NODE));
+        tail = tail->next;
+        tail->tok = t;
+    }
+}
+
+void content_start()
+{
+    if (content_empty)
+    {
+        strcpy(content, "");
+        content_empty = 0;
+    }
+}
+
+void content_end()
+{
+    if (!content_empty)
+    {
+        add_token_node(new_token_string(content));
+        content_empty = 1;
     }
 }
 
 
 
 
-#line 33 "lex.yy.c"
+#line 54 "lexer.c"
 
 #define  YY_INT_ALIGNED short int
 
@@ -392,8 +413,8 @@ static void yy_fatal_error (yyconst char msg[]  );
 	*yy_cp = '\0'; \
 	(yy_c_buf_p) = yy_cp;
 
-#define YY_NUM_RULES 12
-#define YY_END_OF_BUFFER 13
+#define YY_NUM_RULES 11
+#define YY_END_OF_BUFFER 12
 /* This struct is not used in this scanner,
    but its presence is necessary. */
 struct yy_trans_info
@@ -401,10 +422,10 @@ struct yy_trans_info
 	flex_int32_t yy_verify;
 	flex_int32_t yy_nxt;
 	};
-static yyconst flex_int16_t yy_accept[21] =
+static yyconst flex_int16_t yy_accept[19] =
     {   0,
-        8,    8,    0,    0,   13,    8,    7,    7,    1,    3,
-        6,    5,    4,    2,   11,    9,    9,   10,    8,    0
+        0,    0,    0,    0,   12,    8,    7,    7,    1,    3,
+        6,    5,    4,    2,   10,   11,    9,    0
     } ;
 
 static yyconst flex_int32_t yy_ec[256] =
@@ -441,38 +462,36 @@ static yyconst flex_int32_t yy_ec[256] =
 
 static yyconst flex_int32_t yy_meta[13] =
     {   0,
-        1,    1,    1,    1,    1,    2,    2,    1,    1,    1,
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1
     } ;
 
-static yyconst flex_int16_t yy_base[22] =
+static yyconst flex_int16_t yy_base[20] =
     {   0,
-        0,    0,   12,    0,   26,    0,    0,   27,   27,    0,
-        0,    0,    0,    0,   27,   27,   27,   27,    0,   27,
-       24
+        0,    0,   10,   15,   15,   23,   23,   23,   23,   23,
+       23,   23,   23,   23,   23,   23,   23,   23,   13
     } ;
 
-static yyconst flex_int16_t yy_def[22] =
+static yyconst flex_int16_t yy_def[20] =
     {   0,
-       20,    1,   20,    3,   20,   21,   21,   20,   20,   21,
-       21,   21,   21,   21,   20,   20,   20,   20,   21,    0,
-       20
+       18,    1,   19,   19,   18,   18,   18,   18,   18,   18,
+       18,   18,   18,   18,   18,   18,   18,    0,   18
     } ;
 
-static yyconst flex_int16_t yy_nxt[40] =
+static yyconst flex_int16_t yy_nxt[36] =
     {   0,
-        6,    7,    7,    7,    7,    8,    9,   10,   11,   12,
-       13,   14,   15,   16,   17,   16,   16,   16,   18,   15,
-       15,   15,   15,   15,   19,   20,    5,   20,   20,   20,
-       20,   20,   20,   20,   20,   20,   20,   20,   20
+        6,    7,    8,    7,    7,    7,    9,   10,   11,   12,
+       13,   14,   16,   15,   18,   18,   17,   16,   18,   18,
+       18,   17,    5,   18,   18,   18,   18,   18,   18,   18,
+       18,   18,   18,   18,   18
     } ;
 
-static yyconst flex_int16_t yy_chk[40] =
+static yyconst flex_int16_t yy_chk[36] =
     {   0,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    3,    3,    3,    3,    3,    3,    3,    3,
-        3,    3,    3,    3,   21,    5,   20,   20,   20,   20,
-       20,   20,   20,   20,   20,   20,   20,   20,   20
+        1,    1,    3,   19,    5,    0,    3,    4,    0,    0,
+        0,    4,   18,   18,   18,   18,   18,   18,   18,   18,
+       18,   18,   18,   18,   18
     } ;
 
 static yy_state_type yy_last_accepting_state;
@@ -492,7 +511,7 @@ char *yytext;
 #line 1 "lexer.lex"
 
 
-#line 496 "lex.yy.c"
+#line 515 "lexer.c"
 
 #define INITIAL 0
 #define STRINGMODE 1
@@ -675,10 +694,10 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
     
-#line 37 "lexer.lex"
+#line 57 "lexer.lex"
 
 
-#line 682 "lex.yy.c"
+#line 701 "lexer.c"
 
 	if ( !(yy_init) )
 		{
@@ -731,13 +750,13 @@ yy_match:
 			while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 				{
 				yy_current_state = (int) yy_def[yy_current_state];
-				if ( yy_current_state >= 21 )
+				if ( yy_current_state >= 19 )
 					yy_c = yy_meta[(unsigned int) yy_c];
 				}
 			yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
 			++yy_cp;
 			}
-		while ( yy_base[yy_current_state] != 27 );
+		while ( yy_base[yy_current_state] != 23 );
 
 yy_find_action:
 		yy_act = yy_accept[yy_current_state];
@@ -763,75 +782,70 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 41 "lexer.lex"
-{ string_finished = 0; strcpy(content, ""); BEGIN(STRINGMODE); }
+#line 61 "lexer.lex"
+{ content_start(); BEGIN(STRINGMODE); }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 42 "lexer.lex"
-{ add_token_node(new_token_pipe()); }
+#line 62 "lexer.lex"
+{ content_end(); add_token_node(new_token_pipe()); }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 43 "lexer.lex"
-{ add_token_node(new_token_bg());; }
+#line 63 "lexer.lex"
+{ content_end(); add_token_node(new_token_bg());; }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 44 "lexer.lex"
-{ add_token_node(new_token_in()); }
+#line 64 "lexer.lex"
+{ content_end(); add_token_node(new_token_in()); }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 45 "lexer.lex"
-{ add_token_node(new_token_out()); }
+#line 65 "lexer.lex"
+{ content_end(); add_token_node(new_token_out()); }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 46 "lexer.lex"
-{ add_token_node(new_token_next()); }
+#line 66 "lexer.lex"
+{ content_end(); add_token_node(new_token_next()); }
 	YY_BREAK
 case 7:
 /* rule 7 can match eol */
 YY_RULE_SETUP
-#line 47 "lexer.lex"
-{ }
+#line 67 "lexer.lex"
+{ content_end(); }
 	YY_BREAK
 case 8:
-/* rule 8 can match eol */
 YY_RULE_SETUP
-#line 48 "lexer.lex"
-{ add_token_node(new_token_string(yytext)); }
+#line 68 "lexer.lex"
+{ content_start(); strcat(content, yytext); }
 	YY_BREAK
 
 
 
 case 9:
-/* rule 9 can match eol */
 YY_RULE_SETUP
-#line 53 "lexer.lex"
-{ if (string_finished) { add_token_node(new_token_string(content)); BEGIN(INITIAL); } else strcat(content, yytext); }
+#line 73 "lexer.lex"
+{ BEGIN(INITIAL); }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 54 "lexer.lex"
-{ string_finished = 1 - string_finished; }
+#line 74 "lexer.lex"
+{ content_start(); strcat(content, yytext); }
+	YY_BREAK
+
+case YY_STATE_EOF(INITIAL):
+case YY_STATE_EOF(STRINGMODE):
+#line 77 "lexer.lex"
+{ content_end(); yyterminate(); }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 55 "lexer.lex"
-{ strcat(content, yytext); }
-	YY_BREAK
-
-case 12:
-YY_RULE_SETUP
-#line 58 "lexer.lex"
+#line 79 "lexer.lex"
 ECHO;
 	YY_BREAK
-#line 832 "lex.yy.c"
-case YY_STATE_EOF(INITIAL):
-case YY_STATE_EOF(STRINGMODE):
-	yyterminate();
+#line 849 "lexer.c"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -1121,7 +1135,7 @@ static int yy_get_next_buffer (void)
 		while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 			{
 			yy_current_state = (int) yy_def[yy_current_state];
-			if ( yy_current_state >= 21 )
+			if ( yy_current_state >= 19 )
 				yy_c = yy_meta[(unsigned int) yy_c];
 			}
 		yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
@@ -1149,11 +1163,11 @@ static int yy_get_next_buffer (void)
 	while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 		{
 		yy_current_state = (int) yy_def[yy_current_state];
-		if ( yy_current_state >= 21 )
+		if ( yy_current_state >= 19 )
 			yy_c = yy_meta[(unsigned int) yy_c];
 		}
 	yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
-	yy_is_jam = (yy_current_state == 20);
+	yy_is_jam = (yy_current_state == 18);
 
 	return yy_is_jam ? 0 : yy_current_state;
 }
@@ -1827,18 +1841,51 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 58 "lexer.lex"
+#line 79 "lexer.lex"
 
 
 
 TOKEN_LIST_NODE *get_token_list(const char* s)
 {
     head = tail = NULL;
-    char *ts = malloc(strlen(s) + 2);
-    strcpy(ts, s);
-    strcat(ts, " ");
-    yy_scan_string(ts);
+    content_empty = 1;
+    yy_scan_string(s);
     yylex();
     return head;
 }
 
+/*
+
+// debug code
+int main()
+{
+    TOKEN_LIST_NODE *h = get_token_list("test\"abc\"def\"t\" \"ttt\"");
+    while (h != NULL)
+    {
+        switch (h->tok->type)
+        {
+        case TOKEN_TYPE_STRING:
+            printf("%s %s\n", "STRING", h->tok->t_string.str);
+            break;
+        case TOKEN_TYPE_PIPE:
+            printf("%s\n", "PIPE");
+            break;
+        case TOKEN_TYPE_BG:
+            printf("%s\n", "BG");
+            break;
+        case TOKEN_TYPE_IN:
+            printf("%s\n", "IN");
+            break;
+        case TOKEN_TYPE_OUT:
+            printf("%s\n", "OUT");
+            break;
+        case TOKEN_TYPE_NEXT:
+            printf("%s\n", "NEXT");
+            break;
+        }
+        h = h->next;
+    }
+    printf("\n");
+    return 0;
+}
+*/
