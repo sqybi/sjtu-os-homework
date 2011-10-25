@@ -16,8 +16,6 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <readline/readline.h>
-#include "function.h"
-#include "constant.h"
 
 // Variables
 char *line,
