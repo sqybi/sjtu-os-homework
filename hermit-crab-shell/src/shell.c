@@ -16,13 +16,16 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <readline/readline.h>
-#include "lexer.h"
 #include "const.h"
+#include "lexer.h"
+#include "prompt.h"
+#include "tokens.h"
 
 // Variables
 char *single_line,
      *prompt,
      line[STRING_MAX_LENGTH];
+TOKEN_LIST_NODE *head;
 
 // Initialize all vairables of the shell, and other init operations
 void shell_initialize(void)
@@ -30,8 +33,8 @@ void shell_initialize(void)
     // clear the pointers
     single_line = NULL;
     prompt = NULL;
+    head = NULL;
 }
-
 
 int main(int argc, char **argv)
 {
@@ -53,13 +56,13 @@ int main(int argc, char **argv)
         {
             strcat(line, single_line);
             if (single_line) free(single_line);
-            single_line = readline(prompt);
+            single_line = readline("> ");
             line[strlen(line) - 1] = '\0';
         }
         strcat(line, single_line);
 
         // get tokens
-
+        head = get_token_list(line);
     }
     return 0;
 }

@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include "tokens.h"
 #include "const.h"
+#include "lexer.h"
 
 int content_empty;
 char content[STRING_MAX_LENGTH] = "";
@@ -50,7 +51,7 @@ void content_end()
 
 
 
-#line 54 "lexer.c"
+#line 55 "lexer.c"
 
 #define  YY_INT_ALIGNED short int
 
@@ -511,7 +512,7 @@ char *yytext;
 #line 1 "lexer.lex"
 
 
-#line 515 "lexer.c"
+#line 516 "lexer.c"
 
 #define INITIAL 0
 #define STRINGMODE 1
@@ -694,10 +695,10 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
     
-#line 57 "lexer.lex"
+#line 58 "lexer.lex"
 
 
-#line 701 "lexer.c"
+#line 702 "lexer.c"
 
 	if ( !(yy_init) )
 		{
@@ -782,43 +783,43 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 61 "lexer.lex"
+#line 62 "lexer.lex"
 { content_start(); BEGIN(STRINGMODE); }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 62 "lexer.lex"
+#line 63 "lexer.lex"
 { content_end(); add_token_node(new_token_pipe()); }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 63 "lexer.lex"
+#line 64 "lexer.lex"
 { content_end(); add_token_node(new_token_bg());; }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 64 "lexer.lex"
+#line 65 "lexer.lex"
 { content_end(); add_token_node(new_token_in()); }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 65 "lexer.lex"
+#line 66 "lexer.lex"
 { content_end(); add_token_node(new_token_out()); }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 66 "lexer.lex"
+#line 67 "lexer.lex"
 { content_end(); add_token_node(new_token_next()); }
 	YY_BREAK
 case 7:
 /* rule 7 can match eol */
 YY_RULE_SETUP
-#line 67 "lexer.lex"
+#line 68 "lexer.lex"
 { content_end(); }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 68 "lexer.lex"
+#line 69 "lexer.lex"
 { content_start(); strcat(content, yytext); }
 	YY_BREAK
 
@@ -826,26 +827,26 @@ YY_RULE_SETUP
 
 case 9:
 YY_RULE_SETUP
-#line 73 "lexer.lex"
+#line 74 "lexer.lex"
 { BEGIN(INITIAL); }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 74 "lexer.lex"
+#line 75 "lexer.lex"
 { content_start(); strcat(content, yytext); }
 	YY_BREAK
 
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(STRINGMODE):
-#line 77 "lexer.lex"
+#line 78 "lexer.lex"
 { content_end(); yyterminate(); }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 79 "lexer.lex"
+#line 80 "lexer.lex"
 ECHO;
 	YY_BREAK
-#line 849 "lexer.c"
+#line 850 "lexer.c"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -1841,7 +1842,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 79 "lexer.lex"
+#line 80 "lexer.lex"
 
 
 

@@ -4,11 +4,14 @@ run: all
 	make all
 	./hcsh
  
-hcsh: lexer.o tokens.o shell.o
-	gcc -o hcsh lexer.o tokens.o shell.o
+hcsh: lexer.o tokens.o prompt.o shell.o
+	gcc -o hcsh lexer.o tokens.o prompt.o shell.o -lreadline
 
-shell.o: shell.c lexer.h const.h
+shell.o: shell.c const.h lexer.h prompt.h tokens.h
 	gcc -c shell.c
+
+prompt.o: prompt.c prompt.h
+	gcc -c prompt.c
 
 lexer.o: lexer.c tokens.h const.h lexer.h
 	gcc -c lexer.c
