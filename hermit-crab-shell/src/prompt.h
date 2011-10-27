@@ -1,3 +1,5 @@
+#include "debug.h"
+
 #ifndef __PROMPT_H__
 #define __PROMPT_H__
 
@@ -6,6 +8,6 @@
 int get_last_dir_len(const char *);
 
 // Get the prompt string, and return.
-char *get_prompt(void);
+char *get_prompt();
 
 #endif

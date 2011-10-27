@@ -1,5 +1,7 @@
 %top{
 
+#include "debug.h"
+
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -13,12 +15,14 @@ char content[STRING_MAX_LENGTH] = "";
 int ioflag = 0;
 TOKEN_LIST_NODE *head, *tail;
 
+
 void add_token_node(TOKEN *t)
 {
     if (head == NULL)
     {
         head = malloc(sizeof(TOKEN_LIST_NODE));
         head->tok = t;
+        head->next = NULL;
         tail = head;
     }
     else
@@ -53,25 +57,36 @@ space  \n|\r|\t|\f|" "
 
 %option noyywrap
 
-%x STRINGMODE
+%x DOUBLEQUOTE
+%x SINGLEQUOTE
 
 %%
 
 <INITIAL>
 {
-    \"          { content_start(); BEGIN(STRINGMODE); }
+    \"          { content_start(); BEGIN(DOUBLEQUOTE); }
+    \'          { content_start(); BEGIN(SINGLEQUOTE); }
     \|          { content_end(); add_token_node(new_token_pipe()); }
     &           { content_end(); add_token_node(new_token_bg());; }
     \>          { content_end(); add_token_node(new_token_in()); }
     \<          { content_end(); add_token_node(new_token_out()); }
+    \>\>        { content_end(); add_token_node(new_token_append()); }
     ;           { content_end(); add_token_node(new_token_next()); }
     {space}     { content_end(); }
     .           { content_start(); strcat(content, yytext); }
 }
 
-<STRINGMODE>
+<DOUBLEQUOTE>
 {
     \"          { BEGIN(INITIAL); }
+    \\\"        { content_start(); strcat(content, "\""); }
+    \\\\        { content_start(); strcat(content, "\\"); }
+    .           { content_start(); strcat(content, yytext); }
+}
+
+<SINGLEQUOTE>
+{
+    \'          { BEGIN(INITIAL); }
     .           { content_start(); strcat(content, yytext); }
 }
 

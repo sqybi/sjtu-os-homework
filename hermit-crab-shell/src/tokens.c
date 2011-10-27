@@ -1,3 +1,5 @@
+#include "debug.h"
+
 #include <stdlib.h>
 #include <string.h>
 #include "tokens.h"
@@ -44,10 +46,39 @@ TOKEN *new_token_out()
     return t;
 }
 
+TOKEN *new_token_append()
+{
+    TOKEN *t;
+    t = malloc(sizeof(TOKEN));
+    t->type = TOKEN_TYPE_APPEND;
+    return t;
+}
+
 TOKEN *new_token_next()
 {
     TOKEN *t;
     t = malloc(sizeof(TOKEN));
     t->type = TOKEN_TYPE_NEXT;
     return t;
+}
+
+// destructor of token list
+// head is the pointer to the head pointer of token list
+// *head will be NULL when function finished
+void free_token_list(TOKEN_LIST_NODE **head)
+{
+    TOKEN_LIST_NODE *temp_node;
+
+    while (*head != NULL)
+    {
+        temp_node = *head;
+        *head = temp_node->next;
+        // do not forget to free
+        if (temp_node->tok->type == TOKEN_TYPE_STRING)
+        {
+            if (temp_node->tok->t_string.str != NULL)
+                free(temp_node->tok->t_string.str);
+        }
+        free(temp_node);
+    }
 }

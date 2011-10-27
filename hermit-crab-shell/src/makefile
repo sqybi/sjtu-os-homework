@@ -1,29 +1,46 @@
+# make all
+# default entry
 all: hcsh
 
+# make all and run the shell
+# for debug
 run: all
-	make all
 	./hcsh
- 
-hcsh: lexer.o tokens.o prompt.o shell.o
-	gcc -o hcsh lexer.o tokens.o prompt.o shell.o -lreadline
 
-shell.o: shell.c const.h lexer.h prompt.h tokens.h
+# compile the whole shell
+hcsh: shell.o lexer.o parser.o tokens.o command.o inline.o prompt.o
+	gcc -o hcsh shell.o lexer.o parser.o tokens.o command.o inline.o prompt.o -lreadline -lhistory
+
+# compile .c files to .o files
+shell.o: shell.c const.h tokens.h lexer.h parser.h prompt.h debug.h 
 	gcc -c shell.c
-
-prompt.o: prompt.c prompt.h
-	gcc -c prompt.c
-
-lexer.o: lexer.c tokens.h const.h lexer.h
+lexer.o: lexer.c const.h tokens.h lexer.h debug.h
 	gcc -c lexer.c
-
-tokens.o: tokens.c tokens.h const.h
+parser.o: parser.c tokens.h command.h parser.h debug.h
+	gcc -c parser.c
+tokens.o: tokens.c tokens.h debug.h
 	gcc -c tokens.c
+command.o: command.c inline.h command.h debug.h
+	gcc -c command.c
+prompt.o: prompt.c prompt.h debug.h
+	gcc -c prompt.c
+inline.o: inline.c command.h inline.h debug.h
+	gcc -c inline.c
 
+# generate .c files from .lex files
 lexer.c: lexer.lex
 	flex -o lexer.c lexer.lex
 
-lexer.h: tokens.h
+# link for .h files
+lexer.h: tokens.h debug.h
+parser.h: tokens.h command.h debug.h
+tokens.h: debug.h
+command.h: debug.h
+prompt.h: debug.h
+inline.h: command.h debug.h
+const.h: debug.h
 
+# clean process
 .PHONY: clean
 clean:
 	rm -rf hcsh *.o lexer.c

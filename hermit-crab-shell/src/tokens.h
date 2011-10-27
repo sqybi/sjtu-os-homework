@@ -1,15 +1,18 @@
 #ifndef __TOKENS_H__
 #define __TOKENS_H__
 
+#include "debug.h"
+
 // type of tokens
 typedef enum token_type
 {
     TOKEN_TYPE_STRING,
-    TOKEN_TYPE_PIPE,
-    TOKEN_TYPE_BG,
-    TOKEN_TYPE_IN,
-    TOKEN_TYPE_OUT,
-    TOKEN_TYPE_NEXT
+    TOKEN_TYPE_PIPE, // | operator
+    TOKEN_TYPE_BG, // & operator (only at the end of the command)
+    TOKEN_TYPE_IN, // < operator
+    TOKEN_TYPE_OUT, // > operator
+    TOKEN_TYPE_APPEND, // >> operator
+    TOKEN_TYPE_NEXT // ; oprator
 } TOKEN_TYPE;
 
 // definition of tokens
@@ -39,6 +42,11 @@ typedef struct token_out
     TOKEN_TYPE type;
 } TOKEN_OUT;
 
+typedef struct token_append
+{
+    TOKEN_TYPE type;
+} TOKEN_APPEND;
+
 typedef struct token_next
 {
     TOKEN_TYPE type;
@@ -53,6 +61,7 @@ typedef union token
     TOKEN_BG t_bg;
     TOKEN_IN t_in;
     TOKEN_OUT t_out;
+    TOKEN_APPEND t_append;
     TOKEN_NEXT t_next;
 } TOKEN;
 
@@ -62,6 +71,7 @@ TOKEN *new_token_pipe();
 TOKEN *new_token_bg();
 TOKEN *new_token_in();
 TOKEN *new_token_out();
+TOKEN *new_token_append();
 TOKEN *new_token_next();
 
 // list of tokens
@@ -70,5 +80,8 @@ typedef struct token_list_node
     TOKEN *tok;
     struct token_list_node *next;
 } TOKEN_LIST_NODE;
+
+// destructor of token list
+void free_token_list(TOKEN_LIST_NODE **);
 
 #endif
