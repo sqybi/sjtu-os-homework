@@ -18,9 +18,16 @@ TOKEN_LIST_NODE *head, *tail;
 
 void add_token_node(TOKEN *t)
 {
+#ifdef DEBUG
+    printf("[lexer.c] new node adding!\n");
+    printf("[lexer.c] head = %d, tail = %d\n", head, tail);
+#endif
     if (head == NULL)
     {
         head = malloc(sizeof(TOKEN_LIST_NODE));
+#ifdef DEBUG
+    printf("[lexer.c] malloc succeed!\n");
+#endif        
         head->tok = t;
         head->next = NULL;
         tail = head;
@@ -30,7 +37,12 @@ void add_token_node(TOKEN *t)
         tail->next = malloc(sizeof(TOKEN_LIST_NODE));
         tail = tail->next;
         tail->tok = t;
+        tail->next = NULL;
     }
+#ifdef DEBUG
+    printf("[lexer.c] new node added!\n");
+    printf("[lexer.c] head = %d, tail = %d\n", head, tail);
+#endif
 }
 
 void content_start()

@@ -8,24 +8,26 @@ run: all
 	./hcsh
 
 # compile the whole shell
-hcsh: shell.o lexer.o parser.o tokens.o command.o inline.o prompt.o
-	gcc -o hcsh shell.o lexer.o parser.o tokens.o command.o inline.o prompt.o -lreadline -lhistory
+hcsh: shell.o lexer.o parser.o tokens.o command.o inline.o prompt.o dir.o
+	gcc -o hcsh shell.o lexer.o parser.o tokens.o command.o inline.o prompt.o dir.o -lreadline -lhistory
 
 # compile .c files to .o files
 shell.o: shell.c const.h tokens.h lexer.h parser.h prompt.h debug.h 
 	gcc -c shell.c
 lexer.o: lexer.c const.h tokens.h lexer.h debug.h
 	gcc -c lexer.c
-parser.o: parser.c tokens.h command.h parser.h debug.h
+parser.o: parser.c tokens.h command.h parser.h dir.h debug.h
 	gcc -c parser.c
 tokens.o: tokens.c tokens.h debug.h
 	gcc -c tokens.c
-command.o: command.c inline.h command.h debug.h
+command.o: command.c inline.h command.h dir.h debug.h
 	gcc -c command.c
 prompt.o: prompt.c prompt.h debug.h
 	gcc -c prompt.c
 inline.o: inline.c command.h inline.h debug.h
 	gcc -c inline.c
+dir.o: dir.c dir.h debug.h
+	gcc -c dir.c
 
 # generate .c files from .lex files
 lexer.c: lexer.lex
@@ -39,6 +41,7 @@ command.h: debug.h
 prompt.h: debug.h
 inline.h: command.h debug.h
 const.h: debug.h
+dir.h: debug.h
 
 # clean process
 .PHONY: clean

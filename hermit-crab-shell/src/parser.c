@@ -1,5 +1,10 @@
 #include "debug.h"
 
+// define _GNU_SOURCE for get_current_dir_name() function
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#endif
+
 #include <unistd.h>
 #include <stdlib.h>
 #include <sys/stat.h>
@@ -10,6 +15,7 @@
 #include "tokens.h"
 #include "command.h"
 #include "parser.h"
+#include "dir.h"
 
 // check if token is a connector
 int is_connector(TOKEN *t)
@@ -75,6 +81,7 @@ PARSE_STATUS parse_command(TOKEN_LIST_NODE *head, TOKEN_LIST_NODE *tail)
 {
     COMMAND_INFO info;
     int fd;
+    char *temp, *pwd;
 
     init_command_info(&info);
 
@@ -94,11 +101,15 @@ PARSE_STATUS parse_command(TOKEN_LIST_NODE *head, TOKEN_LIST_NODE *tail)
             }
 
             // check if file not exist
-            if (access(head->tok->t_string.str, 0) == -1)
+            pwd = get_current_dir_name();
+            temp = connect_dir(pwd, head->tok->t_string.str);
+            free(pwd);
+            if (access(temp, 0) == -1)
             {
                 free_command_info(info);
                 return PARSE_STATUS_FILE_NOT_EXIST;
             }
+            free(temp);
 
             info.input_file = head->tok->t_string.str;
 
@@ -178,11 +189,13 @@ PARSE_STATUS parse_command(TOKEN_LIST_NODE *head, TOKEN_LIST_NODE *tail)
     // No commands here, what should I run instead?
     if (info.command == NULL)
     {
+        free_command_info(info);
         return PARSE_STATUS_COMMAND_EXPECTED;
     }
     else
     {
         run_command(info);
+        free_command_info(info);
         return PARSE_STATUS_NORMAL;
     }
 }

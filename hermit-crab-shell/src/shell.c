@@ -55,11 +55,9 @@ int main(int argc, char **argv)
     while (1)
     {
         // get last directory of current working directory
-        if (prompt != NULL) free(prompt);
         prompt = get_prompt();
 
         // read command
-        if (single_line != NULL) free(single_line);
         strcpy(line, "");
         single_line = readline(prompt);
         while (strlen(single_line) > 0 &&
@@ -69,7 +67,7 @@ int main(int argc, char **argv)
                  //   [test "ab] also need more text
         {
             strcat(line, single_line);
-            if (single_line != NULL) free(single_line);
+            free(single_line);
             single_line = readline("> ");
             line[strlen(line) - 1] = '\0';
         }
@@ -78,12 +76,12 @@ int main(int argc, char **argv)
         // add to history
         add_history(line);
 
-        // get tokens
-        token_list_head = get_token_list(line);
-
 #ifdef DEBUG
         printf("[shell.c] line = %s\n", line);
 #endif
+
+        // get tokens
+        token_list_head = get_token_list(line);
 
         // parse grammar tree
         // will fork processes here
@@ -100,8 +98,9 @@ int main(int argc, char **argv)
 
         // do some free operation
         free_token_list(&token_list_head);
-        if (pid_list != NULL) free(pid_list);
-        pid_list = NULL;
+        free(pid_list);
+        free(prompt);
+        free(single_line);
         pid_list_len = 0;
     }
     return 0;

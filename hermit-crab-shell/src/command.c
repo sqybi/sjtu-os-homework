@@ -8,6 +8,7 @@
 #include <fcntl.h>
 #include "inline.h"
 #include "command.h"
+#include "dir.h"
 
 extern pid_t *pid_list,
              pid_list_len;
@@ -33,8 +34,7 @@ void init_command_info(COMMAND_INFO *info)
 // because they will be freed in free_token_list() in tokens.c
 void free_command_info(COMMAND_INFO info)
 {
-    if (info.parameters != NULL)
-        free(info.parameters);
+    free(info.parameters);
 }
 
 // run a command
@@ -43,6 +43,7 @@ void run_command(COMMAND_INFO info)
 {
     pid_t pid;
     int fd;
+    char *temp;
 
 #ifdef DEBUG
     printf("[command.c] hey, running command.\n");
@@ -56,6 +57,7 @@ void run_command(COMMAND_INFO info)
         dup(connect_pipe[0]);
         close(connect_pipe[0]);
         free(connect_pipe);
+        connect_pipe = NULL;
     }
     if (info.output_to_pipe)
     {
@@ -116,11 +118,24 @@ void run_command(COMMAND_INFO info)
     // run a program
     else
     {
-        if (access(info.command, 0) == -1)
+        // check the path of command
+        temp = info.command;
+        info.command = check_file_exist(temp);
+#ifdef DEBUG
+        printf("[command.c] returned from check_file_exist()!\n");
+#endif
+        if (info.command == NULL)
         {
-            printf("[hcsh] File \"%s\" not exist!\n", info.command);
+            printf("[hcsh] File \"%s\" not exist!\n", temp);
+            free(temp);
             return;
         }
+        else
+        {
+            free(temp);
+        }
+
+        // fork
         if ((pid = fork()) == 0) // child process
         {
             // modify info.parameters
@@ -136,7 +151,7 @@ void run_command(COMMAND_INFO info)
             if (execvp(info.command, info.parameters) == -1)
             {
                 // if exec error
-                //printf("[hcsh] Unknown error when executing exec().\n");
+                printf("[hcsh] Unknown error when executing exec().\n");
                 exit(0);
             }
         }
