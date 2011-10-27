@@ -30,27 +30,21 @@ int get_last_dir_len(const char *dir)
 char *get_prompt(void)
 {
     unsigned int len, plen;
-    char *temp, *prompt;
+    char *prompt;
     int i;
 
     // get current dir
-    temp = get_current_dir_name();
+    prompt = get_current_dir_name();
 
     // get length of last directory and *dir
-    len = get_last_dir_len(temp);
-    plen = strlen(temp);
+    len = get_last_dir_len(prompt);
+    plen = strlen(prompt);
 
     // create prompt string
-    prompt = malloc(len + 3);
-    for (i = 0; i != len; ++i)
-    {
-        prompt[i] = temp[plen - len + i];
-    }
+    prompt = realloc(len + 3);
     prompt[len] = '>';
     prompt[len + 1] = ' ';
     prompt[len + 2] = '\0';
-
-    if (temp != NULL) free(temp);
 
     return prompt;
 }
