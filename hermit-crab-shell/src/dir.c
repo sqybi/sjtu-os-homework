@@ -43,7 +43,11 @@ char *check_file_exist(char *name)
 #ifdef DEBUG
         printf("[dir.c] path = %s\n", path);
 #endif
-        len = (int) (strstr(path, ":") - path);
+        temp = strstr(path, ":");
+        if (temp != NULL)
+            len = (int) (temp - path);
+        else
+            len = plen;
 #ifdef DEBUG
         printf("[dir.c] len = %d\n", len);
 #endif
@@ -66,15 +70,15 @@ char *check_file_exist(char *name)
 
         if (access(full, 0) == 0)
         {
-            free(temp);
-            free(path);
+           // free(temp);
+           // free(path);
             return full;
         }
 
-        free(temp);
-        free(full);
+       // free(temp);
+       // free(full);
     }
 
-    free(path);
+   // free(path);
     return NULL;
 }

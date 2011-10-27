@@ -11,7 +11,7 @@ void cmd_cd(COMMAND_INFO info)
 
     if (info.parameters_len == 1)
     {
-        dir = "~";
+        dir = "/";
     }
     else
     {
@@ -24,10 +24,9 @@ void cmd_cd(COMMAND_INFO info)
 
     if (chdir(dir) != 0)
     {
-        printf("[hcsh.cd] Directory not found.\n");
-        // TODO(sqybi@126.com): I think this is the only reason to
-        // result an error here. But a check is expected here to make
-        // it better.
+        printf("[hcsh.cd] Directory not found, or permission denied.\n");
+        // TODO(sqybi@126.com): Check when is "not found", and when is
+        // "permission denied". (or other cases?)
     }
 }
 

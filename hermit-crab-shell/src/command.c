@@ -119,20 +119,14 @@ void run_command(COMMAND_INFO info)
     else
     {
         // check the path of command
-        temp = info.command;
-        info.command = check_file_exist(temp);
+        temp = check_file_exist(info.command);
 #ifdef DEBUG
         printf("[command.c] returned from check_file_exist()!\n");
 #endif
-        if (info.command == NULL)
+        if (temp == NULL)
         {
-            printf("[hcsh] File \"%s\" not exist!\n", temp);
-            free(temp);
+            printf("[hcsh] Command \"%s\" not found!\n", info.command);
             return;
-        }
-        else
-        {
-            free(temp);
         }
 
         // fork
@@ -148,7 +142,7 @@ void run_command(COMMAND_INFO info)
 #endif
 
             // RUN it!
-            if (execvp(info.command, info.parameters) == -1)
+            if (execv(temp, info.parameters) == -1)
             {
                 // if exec error
                 printf("[hcsh] Unknown error when executing exec().\n");
@@ -168,6 +162,7 @@ void run_command(COMMAND_INFO info)
             {
                 printf("[hcsh] Process %d running in background.\n", pid);
             }
+            free(temp);
         }
     }
 

@@ -103,13 +103,13 @@ PARSE_STATUS parse_command(TOKEN_LIST_NODE *head, TOKEN_LIST_NODE *tail)
             // check if file not exist
             pwd = get_current_dir_name();
             temp = connect_dir(pwd, head->tok->t_string.str);
-            free(pwd);
+           // free(pwd);
             if (access(temp, 0) == -1)
             {
                 free_command_info(info);
                 return PARSE_STATUS_FILE_NOT_EXIST;
             }
-            free(temp);
+           // free(temp);
 
             info.input_file = head->tok->t_string.str;
 

@@ -76,8 +76,7 @@ void free_token_list(TOKEN_LIST_NODE **head)
         // do not forget to free
         if (temp_node->tok->type == TOKEN_TYPE_STRING)
         {
-            if (temp_node->tok->t_string.str != NULL)
-                free(temp_node->tok->t_string.str);
+            free(temp_node->tok->t_string.str);
         }
         free(temp_node);
     }

@@ -67,7 +67,7 @@ int main(int argc, char **argv)
                  //   [test "ab] also need more text
         {
             strcat(line, single_line);
-            free(single_line);
+           // free(single_line);
             single_line = readline("> ");
             line[strlen(line) - 1] = '\0';
         }
@@ -98,9 +98,9 @@ int main(int argc, char **argv)
 
         // do some free operation
         free_token_list(&token_list_head);
-        free(pid_list);
-        free(prompt);
-        free(single_line);
+       // free(pid_list);
+       // free(prompt);
+       // free(single_line);
         pid_list_len = 0;
     }
     return 0;
