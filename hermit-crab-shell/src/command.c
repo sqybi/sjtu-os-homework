@@ -27,6 +27,7 @@ void init_command_info(COMMAND_INFO *info)
     info->background_mode = 0;
     info->parameters_len = 0;
     info->output_to_pipe = 0;
+    info->wait_processes = 0;
 }
 
 // free all pointers in a COMMAND

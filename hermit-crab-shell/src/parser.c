@@ -1,21 +1,20 @@
 #include "debug.h"
 
-// define _GNU_SOURCE for get_current_dir_name() function
-#ifndef _GNU_SOURCE
-#define _GNU_SOURCE
+#ifdef DEBUG
+#include <stdio.h>
 #endif
-
 #include <unistd.h>
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#ifdef DEBUG
-#include <stdio.h>
-#endif
+#include "const.h"
 #include "tokens.h"
 #include "command.h"
 #include "parser.h"
 #include "dir.h"
+
+extern pid_t *pid_list;
+extern int pid_list_len;
 
 // check if token is a connector
 int is_connector(TOKEN *t)
@@ -81,6 +80,7 @@ PARSE_STATUS parse_command(TOKEN_LIST_NODE *head, TOKEN_LIST_NODE *tail)
 {
     COMMAND_INFO info;
     char *temp, *pwd;
+    int i;
 
     init_command_info(&info);
 
@@ -100,7 +100,8 @@ PARSE_STATUS parse_command(TOKEN_LIST_NODE *head, TOKEN_LIST_NODE *tail)
             }
 
             // check if file not exist
-            pwd = get_current_dir_name();
+            pwd = calloc(sizeof(char *), STRING_MAX_LENGTH);
+            getcwd(pwd, STRING_MAX_LENGTH);
             temp = connect_dir(pwd, head->tok->t_string.str);
             free(pwd);
             if (access(temp, 0) == -1)
@@ -175,7 +176,10 @@ PARSE_STATUS parse_command(TOKEN_LIST_NODE *head, TOKEN_LIST_NODE *tail)
 
             break;
 
-        // other tokens, e.g., TOKEN_TYPE_NEXT
+        case TOKEN_TYPE_NEXT:
+            info.wait_processes = 1;
+
+        // other tokens
         default:
             // do nothing
             break;
@@ -196,6 +200,16 @@ PARSE_STATUS parse_command(TOKEN_LIST_NODE *head, TOKEN_LIST_NODE *tail)
         fprintf(stderr, "[parser.c] will run command %s!\n", info.command);
 #endif
         run_command(&info);
+        if (info.wait_processes)
+        {
+            for (i = 0; i != pid_list_len; ++i)
+            {
+                waitpid(pid_list[i]);
+            }
+            free(pid_list);
+            pid_list = NULL;
+            pid_list_len = 0;
+        }
         free_command_info(info);
         return PARSE_STATUS_NORMAL;
     }

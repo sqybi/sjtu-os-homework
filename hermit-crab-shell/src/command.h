@@ -19,6 +19,9 @@ typedef struct command_info
     int output_to_pipe;
         // 1 when output will be redirect to a pipe,
         // and 0 otherwise
+    int wait_processes;
+        // 1 when need to wait for processes,
+        // and 0 otherwise
 } COMMAND_INFO;
 
 // initialize a COMMAND_INFO variable

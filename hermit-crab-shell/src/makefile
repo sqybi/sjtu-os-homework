@@ -2,6 +2,10 @@
 # default entry
 all: hcsh
 
+# compile under minix
+minix: shell.o lexer.o parser.o tokens.o command.o inline.o prompt.o dir.o
+	gcc -o hcsh shell.o lexer.o parser.o tokens.o command.o inline.o prompt.o dir.o /usr/local/lib/libreadline.a /usr/local/lib/libhistory.a
+
 # make all and run the shell
 # for debug
 run: all
@@ -21,13 +25,13 @@ shell.o: shell.c const.h tokens.h lexer.h parser.h prompt.h debug.h
 	gcc -c shell.c
 lexer.o: lexer.c const.h tokens.h lexer.h debug.h
 	gcc -c lexer.c
-parser.o: parser.c tokens.h command.h parser.h dir.h debug.h
+parser.o: parser.c const.h tokens.h command.h parser.h dir.h debug.h
 	gcc -c parser.c
 tokens.o: tokens.c tokens.h debug.h
 	gcc -c tokens.c
 command.o: command.c inline.h command.h dir.h debug.h
 	gcc -c command.c
-prompt.o: prompt.c prompt.h debug.h
+prompt.o: prompt.c const.h prompt.h debug.h
 	gcc -c prompt.c
 inline.o: inline.c command.h inline.h debug.h
 	gcc -c inline.c

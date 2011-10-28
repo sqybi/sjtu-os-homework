@@ -1,16 +1,12 @@
 #include "debug.h"
 
-// define _GNU_SOURCE for get_current_dir_name() function
-#ifndef _GNU_SOURCE
-#define _GNU_SOURCE
-#endif
-
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
 #ifdef DEBUG
 #include <stdio.h>
 #endif
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include "const.h"
 #include "prompt.h"
 
 // Get the length of last directory in a directory string.
@@ -39,7 +35,8 @@ char *get_prompt()
     char *prompt;
 
     // get current dir
-    prompt = get_current_dir_name();
+    prompt = calloc(sizeof(char *), STRING_MAX_LENGTH);
+    getcwd(prompt, STRING_MAX_LENGTH);
 #ifdef DEBUG
     fprintf(stderr, "[prompt.c] The whole dir is \"%s\"\n", prompt);
 #endif
