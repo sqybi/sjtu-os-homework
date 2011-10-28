@@ -18,16 +18,9 @@ TOKEN_LIST_NODE *head, *tail;
 
 void add_token_node(TOKEN *t)
 {
-#ifdef DEBUG
-    printf("[lexer.c] new node adding!\n");
-    printf("[lexer.c] head = %d, tail = %d\n", head, tail);
-#endif
     if (head == NULL)
     {
-        head = malloc(sizeof(TOKEN_LIST_NODE));
-#ifdef DEBUG
-    printf("[lexer.c] malloc succeed!\n");
-#endif        
+        head = malloc(sizeof(TOKEN_LIST_NODE));        
         head->tok = t;
         head->next = NULL;
         tail = head;
@@ -40,8 +33,8 @@ void add_token_node(TOKEN *t)
         tail->next = NULL;
     }
 #ifdef DEBUG
-    printf("[lexer.c] new node added!\n");
-    printf("[lexer.c] head = %d, tail = %d\n", head, tail);
+    fprintf(stderr, "[lexer.c] new node added!\n");
+    fprintf(stderr, "[lexer.c] head = %d, tail = %d\n", head, tail);
 #endif
 }
 
@@ -80,8 +73,8 @@ space  \n|\r|\t|\f|" "
     \'          { content_start(); BEGIN(SINGLEQUOTE); }
     \|          { content_end(); add_token_node(new_token_pipe()); }
     &           { content_end(); add_token_node(new_token_bg());; }
-    \>          { content_end(); add_token_node(new_token_in()); }
-    \<          { content_end(); add_token_node(new_token_out()); }
+    \<          { content_end(); add_token_node(new_token_in()); }
+    \>          { content_end(); add_token_node(new_token_out()); }
     \>\>        { content_end(); add_token_node(new_token_append()); }
     ;           { content_end(); add_token_node(new_token_next()); }
     {space}     { content_end(); }

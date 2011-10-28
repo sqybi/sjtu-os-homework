@@ -82,6 +82,6 @@ typedef struct token_list_node
 } TOKEN_LIST_NODE;
 
 // destructor of token list
-void free_token_list(TOKEN_LIST_NODE **);
+void free_token_list(TOKEN_LIST_NODE *);
 
 #endif

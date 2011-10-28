@@ -7,12 +7,17 @@ all: hcsh
 run: all
 	./hcsh
 
+# test mode
+test: shell.c lexer.c parser.c tokens.c command.c inline.c prompt.c dir.c\
+      lexer.h parser.h tokens.h command.h prompt.h inline.h const.h dir.h
+	gcc -o hcsh -Wall -g shell.c lexer.c parser.c tokens.c command.c inline.c prompt.c dir.c -lreadline -lhistory
+
 # compile the whole shell
 hcsh: shell.o lexer.o parser.o tokens.o command.o inline.o prompt.o dir.o
 	gcc -o hcsh shell.o lexer.o parser.o tokens.o command.o inline.o prompt.o dir.o -lreadline -lhistory
 
 # compile .c files to .o files
-shell.o: shell.c const.h tokens.h lexer.h parser.h prompt.h debug.h 
+shell.o: shell.c const.h tokens.h lexer.h parser.h prompt.h debug.h
 	gcc -c shell.c
 lexer.o: lexer.c const.h tokens.h lexer.h debug.h
 	gcc -c lexer.c

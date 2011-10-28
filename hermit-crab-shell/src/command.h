@@ -28,6 +28,6 @@ void init_command_info(COMMAND_INFO *);
 void free_command_info(COMMAND_INFO);
 
 // run a command
-void run_command(COMMAND_INFO);
+void run_command(COMMAND_INFO *);
 
 #endif

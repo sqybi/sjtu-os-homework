@@ -46,16 +46,10 @@ PARSE_STATUS parse_connector(TOKEN_LIST_NODE *head, TOKEN_LIST_NODE *tail)
 
     // check until connector occurs
     cur = head;
-#ifdef DEBUG
-    printf("[parser.c] cur = %d, cur->next = %d.\n", cur, cur->next);
-#endif
     while (cur->next != tail && !is_connector(cur->tok))
     {
         cur = cur->next;
     }
-#ifdef DEBUG
-    printf("[parser.c] cur->next = %d, tail = %d\n", cur->next, tail);
-#endif
 
     // check if a pipe operator (|) at the end
     if (cur->tok->type == TOKEN_TYPE_PIPE &&
@@ -64,10 +58,16 @@ PARSE_STATUS parse_connector(TOKEN_LIST_NODE *head, TOKEN_LIST_NODE *tail)
         return PARSE_STATUS_ILLEGAL_CONNECTOR;
     }
 
+#ifdef DEBUG
+    fprintf(stderr, "[parser.c] parse command %d %d\n", head, cur->next);
+#endif
     p = parse_command(head, cur->next);
     if (p != PARSE_STATUS_NORMAL)
         return p;
 
+#ifdef DEBUG
+    fprintf(stderr, "[parser.c] parse connector %d %d\n", cur->next, tail);
+#endif
     p = parse_connector(cur->next, tail);
     if (p != PARSE_STATUS_NORMAL)
             return p;
@@ -80,7 +80,6 @@ PARSE_STATUS parse_connector(TOKEN_LIST_NODE *head, TOKEN_LIST_NODE *tail)
 PARSE_STATUS parse_command(TOKEN_LIST_NODE *head, TOKEN_LIST_NODE *tail)
 {
     COMMAND_INFO info;
-    int fd;
     char *temp, *pwd;
 
     init_command_info(&info);
@@ -103,13 +102,13 @@ PARSE_STATUS parse_command(TOKEN_LIST_NODE *head, TOKEN_LIST_NODE *tail)
             // check if file not exist
             pwd = get_current_dir_name();
             temp = connect_dir(pwd, head->tok->t_string.str);
-           // free(pwd);
+            free(pwd);
             if (access(temp, 0) == -1)
             {
                 free_command_info(info);
                 return PARSE_STATUS_FILE_NOT_EXIST;
             }
-           // free(temp);
+            free(temp);
 
             info.input_file = head->tok->t_string.str;
 
@@ -127,7 +126,7 @@ PARSE_STATUS parse_command(TOKEN_LIST_NODE *head, TOKEN_LIST_NODE *tail)
             }
 
             // if file not exist, create it, or clear it
-            close(open(head->tok->t_string.str, O_WRONLY | O_CREAT));
+            close(open(head->tok->t_string.str, O_WRONLY | O_CREAT, 0644));
 
             info.output_file = head->tok->t_string.str;
             info.append_mode = 0;
@@ -146,7 +145,7 @@ PARSE_STATUS parse_command(TOKEN_LIST_NODE *head, TOKEN_LIST_NODE *tail)
             }
 
             // if file not exist, create it, or do nothing
-            close(open(head->tok->t_string.str, O_WRONLY | O_CREAT | O_APPEND));
+            close(open(head->tok->t_string.str, O_WRONLY | O_CREAT | O_APPEND, 0644));
 
             info.output_file = head->tok->t_string.str;
             info.append_mode = 1;
@@ -162,8 +161,7 @@ PARSE_STATUS parse_command(TOKEN_LIST_NODE *head, TOKEN_LIST_NODE *tail)
             // add this string to parameters
             ++info.parameters_len;
             info.parameters = realloc(info.parameters, sizeof(char *) * info.parameters_len);
-            info.parameters[info.parameters_len - 1] =
-                    head->tok->t_string.str;
+            info.parameters[info.parameters_len - 1] = head->tok->t_string.str;
 
             break;
 
@@ -194,7 +192,10 @@ PARSE_STATUS parse_command(TOKEN_LIST_NODE *head, TOKEN_LIST_NODE *tail)
     }
     else
     {
-        run_command(info);
+#ifdef DEBUG
+        fprintf(stderr, "[parser.c] will run command %s!\n", info.command);
+#endif
+        run_command(&info);
         free_command_info(info);
         return PARSE_STATUS_NORMAL;
     }

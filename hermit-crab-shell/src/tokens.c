@@ -1,5 +1,8 @@
 #include "debug.h"
 
+#ifdef DEBUG
+#include <stdio.h>
+#endif
 #include <stdlib.h>
 #include <string.h>
 #include "tokens.h"
@@ -64,15 +67,17 @@ TOKEN *new_token_next()
 
 // destructor of token list
 // head is the pointer to the head pointer of token list
-// *head will be NULL when function finished
-void free_token_list(TOKEN_LIST_NODE **head)
+void free_token_list(TOKEN_LIST_NODE *head)
 {
     TOKEN_LIST_NODE *temp_node;
 
-    while (*head != NULL)
+    while (head != NULL)
     {
-        temp_node = *head;
-        *head = temp_node->next;
+#ifdef DEBUG
+        fprintf(stderr, "[tokens.c] freeing token list node, type %d\n", head->tok->type);
+#endif
+        temp_node = head;
+        head = temp_node->next;
         // do not forget to free
         if (temp_node->tok->type == TOKEN_TYPE_STRING)
         {

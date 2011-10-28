@@ -10,11 +10,11 @@
 #include "command.h"
 #include "dir.h"
 
-extern pid_t *pid_list,
-             pid_list_len;
-int *connect_pipe = NULL,
-    in = 0,
-    out = 1;
+extern pid_t *pid_list;
+extern int pid_list_len;
+static int *connect_pipe = NULL,
+           in = 0,
+           out = 1;
 
 // initialize a COMMAND_INFO variable
 void init_command_info(COMMAND_INFO *info)
@@ -39,19 +39,18 @@ void free_command_info(COMMAND_INFO info)
 
 // run a command
 // informations have been writen in info
-void run_command(COMMAND_INFO info)
+void run_command(COMMAND_INFO *info)
 {
     pid_t pid;
-    int fd;
-    char *temp;
-
-#ifdef DEBUG
-    printf("[command.c] hey, running command.\n");
-#endif
+    char *full_name;
+    void *temp;
 
     // deal with connect_pipes
     if (connect_pipe != NULL)
     {
+#ifdef DEBUG
+        fprintf(stderr, "[command.c] pipe 0\n");
+#endif
         in = dup(0);
         close(0);
         dup(connect_pipe[0]);
@@ -59,9 +58,13 @@ void run_command(COMMAND_INFO info)
         free(connect_pipe);
         connect_pipe = NULL;
     }
-    if (info.output_to_pipe)
+    if (info->output_to_pipe)
     {
+#ifdef DEBUG
+        fprintf(stderr, "[command.c] pipe 1\n");
+#endif
         connect_pipe = calloc(sizeof(int), 2);
+        pipe(connect_pipe);
         out = dup(1);
         close(1);
         dup(connect_pipe[1]);
@@ -69,45 +72,48 @@ void run_command(COMMAND_INFO info)
     }
 
     // input and output redirect
-    if (info.input_file != NULL)
+    if (info->input_file != NULL)
     {
+#ifdef DEBUG
+        fprintf(stderr, "[command.c] input\n");
+#endif
+        in = dup(0);
         close(0);
-        fd = open(info.input_file, O_RDONLY);
-        dup(fd);
-        close(fd);
+        open(info->input_file, O_RDONLY);
     }
-    if (info.output_file != NULL)
+    if (info->output_file != NULL)
     {
+#ifdef DEBUG
+        fprintf(stderr, "[command.c] output\n");
+#endif
+        out = dup(1);
         close(1);
-        if (info.append_mode)
+        if (info->append_mode)
         {
-            fd = open(info.output_file, O_WRONLY | O_APPEND);
-            dup(fd);
-            close(fd);
+            open(info->output_file, O_WRONLY | O_APPEND);
         }
         else
         {
-            fd = open(info.output_file, O_WRONLY);
-            dup(fd);
-            close(fd);
+            open(info->output_file, O_WRONLY);
         }
     }
 
     /* run commands below */
 
     // inline commands
-    if (strcmp(info.command, "cd") == 0 ||
-        strcmp(info.command, "exit") == 0)
+    if (strcmp(info->command, "cd") == 0 ||
+        strcmp(info->command, "exit") == 0)
     {
-        if (!info.background_mode)
+        if (!info->background_mode)
         {
-            inline_cmd(info);
+            inline_cmd(*info);
         }
         else
         {
             if ((pid = fork()) == 0)
             {
-                inline_cmd(info);
+                inline_cmd(*info);
+                exit(0);
             }
             else
             {
@@ -119,30 +125,25 @@ void run_command(COMMAND_INFO info)
     else
     {
         // check the path of command
-        temp = check_file_exist(info.command);
-#ifdef DEBUG
-        printf("[command.c] returned from check_file_exist()!\n");
-#endif
-        if (temp == NULL)
+        full_name = check_file_exist(info->command);
+        if (full_name == NULL)
         {
-            printf("[hcsh] Command \"%s\" not found!\n", info.command);
+            printf("[hcsh] Command \"%s\" not found!\n", info->command);
             return;
         }
 
         // fork
         if ((pid = fork()) == 0) // child process
         {
-            // modify info.parameters
-            // last item in info.parameters is NULL (what execvp() needed)
-            info.parameters = realloc(info.parameters, sizeof(char *) * (info.parameters_len + 1));
-            info.parameters[info.parameters_len] = NULL;
-#ifdef DEBUG
-            printf("[command.c] info.parameters[1] = %s, info.parameters = %d, with info.parameters_len = %d\n", info.parameters[1], info.parameters, info.parameters_len);
-            printf("[command.c] info.command = %s\n", info.command);
-#endif
+            // modify info->parameters
+            // last item in info->parameters is NULL (what execvp() needed)
+            temp = realloc(info->parameters, sizeof(char *) * (info->parameters_len + 1));
+            if (temp != NULL)
+                info->parameters = (char **) temp;
+            info->parameters[info->parameters_len] = NULL;
 
             // RUN it!
-            if (execv(temp, info.parameters) == -1)
+            if (execv(full_name, info->parameters) == -1)
             {
                 // if exec error
                 printf("[hcsh] Unknown error when executing exec().\n");
@@ -152,18 +153,22 @@ void run_command(COMMAND_INFO info)
         else // parent process
         {
             // add to wait list if not in background mode
-            if (!info.background_mode)
+            if (!info->background_mode)
             {
                 ++pid_list_len;
-                pid_list = realloc(pid_list, sizeof(pid_t) * pid_list_len);
+                temp = realloc(pid_list, sizeof(pid_t) * pid_list_len);
+                if (temp != NULL)
+                    pid_list = (pid_t *) temp;
                 pid_list[pid_list_len - 1] = pid;
             }
             else
             {
                 printf("[hcsh] Process %d running in background.\n", pid);
             }
-            free(temp);
         }
+
+        // free
+        free(full_name);
     }
 
     /* run commands finished */
@@ -172,12 +177,16 @@ void run_command(COMMAND_INFO info)
     if (in != 0)
     {
         close(0);
-        in = dup(in);
+        dup(in);
+        close(in);
+        in = 0;
     }
     if (out != 1)
     {
         close(1);
-        out = dup(out);
+        dup(out);
+        close(out);
+        out = 1;
     }
 }
 

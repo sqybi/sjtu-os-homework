@@ -2,6 +2,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
+#include <string.h>
 #include "command.h"
 #include "inline.h"
 
@@ -19,12 +21,12 @@ void cmd_cd(COMMAND_INFO info)
     }
 
 #ifdef DEBUG
-    printf("[inline.c] dir = %s\n", dir);
+    fprintf(stderr, "[inline.c] dir = %s\n", dir);
 #endif
 
     if (chdir(dir) != 0)
     {
-        printf("[hcsh.cd] Directory not found, or permission denied.\n");
+        printf("[hcsh] Directory not found, or permission denied.\n");
         // TODO(sqybi@126.com): Check when is "not found", and when is
         // "permission denied". (or other cases?)
     }
@@ -35,14 +37,14 @@ void cmd_exit(COMMAND_INFO info)
     if (info.parameters_len == 1)
     {
 #ifdef DEBUG
-        printf("[inline.c] exiting without parameters.\n");
+        fprintf(stderr, "[inline.c] exiting without parameters.\n");
 #endif
         exit(0);
     }
     else
     {
 #ifdef DEBUG
-        printf("[inline.c] exiting with parameters %s.\n", info.parameters[1]);
+        fprintf(stderr, "[inline.c] exiting with parameters %s.\n", info.parameters[1]);
 #endif
         exit(atoi(info.parameters[1]));
     }

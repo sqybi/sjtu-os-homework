@@ -37,12 +37,11 @@ char *get_prompt()
 {
     unsigned int len, plen;
     char *prompt;
-    int i;
 
     // get current dir
     prompt = get_current_dir_name();
 #ifdef DEBUG
-    printf("[prompt.c] The whole dir is \"%s\"\n", prompt);
+    fprintf(stderr, "[prompt.c] The whole dir is \"%s\"\n", prompt);
 #endif
 
     // get length of last directory and *dir

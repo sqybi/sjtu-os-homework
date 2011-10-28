@@ -12,6 +12,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <sys/stat.h>
 #include <readline/readline.h>
 #include <readline/history.h>
 #include "const.h"
@@ -27,8 +28,8 @@ char *single_line,
      line[STRING_MAX_LENGTH];
 TOKEN_LIST_NODE *token_list_head;
 PARSE_STATUS p;
-pid_t *pid_list, // PIDs to wait
-      pid_list_len; // length of pid_list
+pid_t *pid_list; // PIDs to wait
+int pid_list_len; // length of pid_list
 
 // Initialize all vairables of the shell, and other init operations
 void shell_initialize(void)
@@ -43,6 +44,9 @@ void shell_initialize(void)
 
     // using history
     using_history();
+
+    // set umask
+    umask(0);
 }
 
 int main(int argc, char **argv)
@@ -67,17 +71,22 @@ int main(int argc, char **argv)
                  //   [test "ab] also need more text
         {
             strcat(line, single_line);
-           // free(single_line);
+            free(single_line);
             single_line = readline("> ");
             line[strlen(line) - 1] = '\0';
         }
         strcat(line, single_line);
 
         // add to history
-        add_history(line);
+        // TODO(sqybi@126.com): maybe some bug here
+        free(single_line);
+        single_line = calloc(sizeof(char), strlen(line) + 1);
+        strcpy(single_line, line);
+        add_history(single_line);
+        // do NOT free single_line!
 
 #ifdef DEBUG
-        printf("[shell.c] line = %s\n", line);
+        fprintf(stderr, "[shell.c] line = %s\n", line);
 #endif
 
         // get tokens
@@ -91,17 +100,26 @@ int main(int argc, char **argv)
         {
             printf("[hcsh] Syntax error code %d.\n", p);
         }
+
+        // wait processes
+#ifdef DEBUG
+        fprintf(stderr, "[shell.c] pid_list_len = %d\n", pid_list_len);
+#endif
         for (i = 0; i != pid_list_len; ++i)
         {
             waitpid(pid_list[i], NULL, 0);
         }
 
         // do some free operation
-        free_token_list(&token_list_head);
-       // free(pid_list);
-       // free(prompt);
-       // free(single_line);
-        pid_list_len = 0;
+        free_token_list(token_list_head);
+        if (pid_list_len != 0)
+        {
+            free(pid_list);
+            pid_list = NULL;
+            pid_list_len = 0;
+        }
+        free(prompt);
+        free(single_line);
     }
     return 0;
 }

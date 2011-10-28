@@ -34,51 +34,33 @@ char *check_file_exist(char *name)
     char *path, *temp, *full;
     int plen, len;
 
-    path = calloc(sizeof(char), strlen(getenv("PATH")) + 1);
-    strcpy(path, getenv("PATH"));
-    temp = NULL;
+    path = getenv("PATH");
 
     while ((plen = strlen(path)) != 0)
     {
-#ifdef DEBUG
-        printf("[dir.c] path = %s\n", path);
-#endif
         temp = strstr(path, ":");
         if (temp != NULL)
             len = (int) (temp - path);
         else
             len = plen;
-#ifdef DEBUG
-        printf("[dir.c] len = %d\n", len);
-#endif
         temp = calloc(sizeof(char), len + 1);
         strncpy(temp, path, len);
         temp[len] = '\0';
-#ifdef DEBUG
-        printf("[dir.c] temp = %s\n", temp);
-#endif
-        strncpy(path, path + len + 1, plen);
-#ifdef DEBUG
-        printf("[dir.c] path (again) = %s\n", path);
-#endif
+        path += len + 1;
 
         full = connect_dir(temp, name);
 
-#ifdef DEBUG
-        printf("[dir.c] full = %s\n", full);
-#endif
-
         if (access(full, 0) == 0)
         {
-           // free(temp);
-           // free(path);
+            free(temp);
             return full;
         }
-
-       // free(temp);
-       // free(full);
+        else
+        {
+            free(temp);
+            free(full);
+        }
     }
 
-   // free(path);
     return NULL;
 }
