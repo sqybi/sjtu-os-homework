@@ -129,8 +129,16 @@ void run_command(COMMAND_INFO *info)
         full_name = check_file_exist(info->command);
         if (full_name == NULL)
         {
-            printf("[hcsh] Command \"%s\" not found!\n", info->command);
-            return;
+            if (access(info->command, 0) == 0)
+            {
+                full_name = calloc(sizeof(char *), strlen(info->command) + 1);
+                strcpy(full_name, info->command);
+            }
+            else
+            {
+                printf("[hcsh] Command \"%s\" not found!\n", info->command);
+                return;
+            }
         }
 
         // fork
