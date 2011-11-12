@@ -4,6 +4,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <signal.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include "inline.h"
@@ -144,6 +145,10 @@ void run_command(COMMAND_INFO *info)
         // fork
         if ((pid = fork()) == 0) // child process
         {
+            // reset SIGINT
+            if (!info->background_mode)
+                signal(SIGINT, SIG_DFL);
+
             // modify info->parameters
             // last item in info->parameters is NULL (what execvp() needed)
             temp = realloc(info->parameters, sizeof(char *) * (info->parameters_len + 1));

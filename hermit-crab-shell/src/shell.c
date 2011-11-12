@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <signal.h>
 #include <sys/wait.h>
 #include <sys/stat.h>
 #include <readline/readline.h>
@@ -34,6 +35,9 @@ int pid_list_len; // length of pid_list
 // Initialize all vairables of the shell, and other init operations
 void shell_initialize(void)
 {
+    // no SIGINT signal
+    signal(SIGINT, SIG_IGN);
+
     // clear the pointers
     single_line = NULL;
     prompt = NULL;
