@@ -1,0 +1,204 @@
+\documentclass{article}
+
+\usepackage[slantfont, boldfont]{xeCJK}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\usepackage{geometry}
+\usepackage{indentfirst}
+\usepackage{mdwlist}
+\usepackage{listings}
+
+% set fonts
+\setCJKmainfont[BoldFont={Adobe Heiti Std},
+                ItalicFont={Adobe Kaiti Std}]
+               {Adobe Song Std}
+\setCJKmonofont{Adobe Fangsong Std}
+%\setmainfont[Mapping=tex-text]{Times New Roman}
+%\setsansfont{Helvetica}
+%\setmonofont{Courier New}
+\punctstyle{kaiming}
+
+% set page style
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{\textbf{Project 1: Hermit Crab Shell}}
+\rhead{\leftmark}
+\cfoot{\thepage}
+\renewcommand{\headrulewidth}{1pt}
+\renewcommand{\footrulewidth}{0pt}
+
+% set figure, table, etc name
+\renewcommand\figurename{图}
+\renewcommand\tablename{表}
+\renewcommand\contentsname{目录}
+
+% set listing style
+\lstset{numbers=none,
+       numberstyle=\scriptsize,
+       frame=lines,
+       flexiblecolumns=false,
+       language=,
+       basicstyle=\ttfamily\small,
+       breaklines=true,
+       extendedchars=true,
+       escapechar=\%,
+       texcl=true,
+       showstringspaces=true,
+       keywordstyle=\bfseries,
+       tabsize=4}
+
+% set title page
+\title{\textbf{操作系统Project 1报告}\\（Hermit Crab Shell）}
+\author{隋清宇\\5090309011}
+\date{2011-11}
+
+\begin{document}
+\maketitle
+\thispagestyle{empty}
+\newpage
+
+\tableofcontents
+\thispagestyle{empty}
+\newpage
+
+\setcounter{page}{1}
+\section{概述}
+本项目名为Hermit Crab Shell，目的是实现一个简单的shell。
+
+本程序可以在Minix下编译运行，也可以在Linux下编译运行；需要readline库的支持。详细编译参数请参照makefile。
+
+\section{项目结构}
+本项目包含多个文件，每个文件的作用如下：
+
+\subsection{shell.c}
+本文件为shell的启动文件，包含main函数。其中包括了shell运行的整个流程：读入命令——处理命令——执行命令。
+
+\subsection{const.h}
+本文件中定义了shell所需要的几个全局常量，包括一条命令的最大长度等。可以于编译前修改此文件以更改这些设置。
+
+\subsection{debug.h}
+这个头文件在每个文件前都会被包括，作用是定义一个DEBUG宏，以开启一些调试信息。
+
+\subsection{dir.c/h}
+这两个文件中包含了一些和目录处理有关的函数。
+
+\subsection{inline.c/h}
+这两个文件中包含了内部命令的具体实现。
+
+\subsection{command.c/h}
+这两个文件中定义了一系列和命令相关的数据结构，并实现了运行一条命令的函数。
+
+\subsection{prompt.c/h}
+这两个文件中定义了一些和获取当前命令提示符相关的函数。
+
+\subsection{tokens.c/h}
+这两个文件中定义了一系列和token相关的数据结构，以及它们的构造和析构函数（需要手动调用）。
+
+\subsection{lexer.lex/h}
+这两个文件是词法分析器的实现，使用Flex生成。
+
+\subsection{parser.c/h}
+这两个文件是语法分析器的实现，实现中手动遍历了语法树，并提取出相关信息传递给command.c或inline.c中的函数执行。
+
+\subsection{makefile}
+这是整个项目的makefile，可以使用make编译。
+
+\section{项目功能}
+
+\subsection{基本界面}
+本shell由显示当前路径的输入提示符开头，可以在之后输入命令的内容。
+
+\subsection{执行可执行文件}
+可以执行包括参数的可执行文件。
+
+\subsection{简单的错误提示}
+如果出现语法错误会报错并提示错误号。
+
+错误号的具体对应详见parser.h内的枚举类型PARSE\_STATUS。
+
+\subsection{内置简单shell命令}
+内置有cd和exit命令，分别用来更改当前路径与退出shell。
+
+exit命令支持一个正整数作为参数，表示退出时的错误号。
+
+\subsection{I/O重定向}
+使用>、<或>$ $>符号进行I/O重定向。
+
+\subsection{管道}
+使用|符号进行无名管道连接。
+
+\subsection{后台运行}
+使用\&符号使一个程序后台运行。
+
+\subsection{顺序执行多个命令}
+使用;符号顺序执行多个命令。
+
+\subsection{多个重定向、管道、后台运行与执行命令的组合}
+以上几种连接符可以交替使用，运行效果与bash一致。
+
+\subsection{历史记录与自动补全}
+使用readline和history库实现，与bash的用法基本一致。使用上、下键可以切换历史记录，使用tab键进行补全。
+
+\subsection{字符串支持}
+支持双引号字符串，连接方式与bash类似，实现了一部分通配符。
+
+例如：执行命令
+
+\begin{lstlisting}
+e"ch"o "abc""def"
+\end{lstlisting}
+
+可以输出字符串``abcdef''（不含引号）。
+
+\section{设计思路}
+最开始，我试图不使用词法和语法分析器完成这个shell。但是很可惜，随着代码的编写，我发现这样有很多扩展将很难完成。于是我更改了程序的架构，使用Flex生成了词法分析器，并自己编写了语法分析器，从而使程序的可扩展性上升了一个级别。程序也是从这时开始被提交到GitHub维护的。
+
+整个程序的大致运行过程为：
+
+\begin{enumerate*}
+\item 显示提示符并读入命令；
+\item 对命令进行词法分析得到token流；
+\item 对token流进行语法分析得到command；
+\item 调用函数执行command；
+\item 在command全部执行后进行waitpid等操作；
+\item 重复这个过程。
+\end{enumerate*}
+
+\section{设计细节}
+
+\subsection{自动补全和历史记录}
+这一部分的完成上，我使用了readline库。在控制历史记录的时候，出现了一些小麻烦——运行过程中有很多历史记录变成了乱码。
+
+经过调试，我发现add\_history这个函数并不会自动拷贝传入的字符串到新的内存。所以我将代码改为不free传入的内存，成功。（在注释中有说明：``do NOT free single\_line!''）
+
+\subsection{词法分析和语法分析}
+词法分析器的部分，我是用Flex完成的。但是即使这样，还是遇到了不小的麻烦。
+
+因为编译原理的大作业我是使用ANTLR完成的，所以对Flex和yacc并不熟悉。一开始的时候，我完全是在“摸着石头过河”。而这时我还没有查询Flex和yacc怎么连接，这直接导致了我的token符号定义是用了自己的tokens.h文件。
+
+而在查阅了更多资料之后，我发现如果想要让Flex和yacc连接，必须使用yacc生成的tokens文件，这样要对代码做不小的改动。于是，我决定自己手写一个语法分析器。
+
+语法分析器的实现中，遇到的问题并不大。我设计了几个函数，每个函数可以分析一个特定的语法单元，并调用其它的函数进行进一步处理。
+
+在最开始我有一个做法是，每分析出一个command随即在parser中执行。但是这样做实际上会在程序规模扩大后导致增加新功能的花费增多，并不是一个很好的做法。所以，我在之后的版本中将command抽象成了一个数据结构，这样就可以用一个更普适的处理函数去处理执行命令的步骤，也增强了代码的内聚性。
+
+\subsection{内存泄露}
+调试代码的时候，我遇到的最大问题就是严重的内存泄漏。因为之前很少用C编写代码，突然从Python和C\#等有内存管理的语言转到C语言，有一些不太熟悉。
+
+直到我找到了一个叫做valgrind的工具，这个问题才得以解决。这个工具可以检查C/C++程序中的内存泄露并报错，非常适合调试程序。
+
+但实际上，一些更好的编程风格会使得内存泄露问题不再出现的那么频繁。比如将大部分对象定义为指针类型，并为它们提供构造和析构函数；拷贝对象的时候提供函数，在内部进行深拷贝等。
+
+\section{其它信息}
+
+\subsection{最新版本}
+可以在GitHub上获取到本程序的最新版本。
+
+地址：https://github.com/sqybi/OS-Homework/tree/master/Chapter2/p02
+
+\subsection{协议}
+所有的代码都在以下协议下发布：
+
+GNU General Public License v3：http://www.gnu.org/licenses/gpl.html
+
+\end{document}
